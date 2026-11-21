@@ -1,50 +1,65 @@
 <div align="center">
 
-# Ostrov — a Dynamic-Island-style launcher for Windows 11
+# Остров — динамический остров для Windows 11
 
-A small black pill at the top of your screen that expands into music, weather, timers, projects, clipboard, phone notifications, Claude Code requests, quick AI answers and more.
+Маленькая чёрная плашка вверху экрана. Нажмёшь — она раскрывается и показывает музыку, погоду, таймеры, проекты, буфер обмена, уведомления с телефона и многое другое. А пока свёрнута, тихо подсказывает, что происходит: идёт таймер, играет музыка, Claude работает.
 
-**[Русская версия](README.ru.md)** · [Design playground](docs/island-demo.html) · [Architecture](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
+**[English](README.en.md)** · [Стенд дизайна](docs/island-demo.html) · [Устройство](docs/ARCHITECTURE.md) · [Как участвовать](CONTRIBUTING.md)
 
-<img src="docs/images/tabs.gif" alt="Ostrov tabs" width="560">
+<img src="docs/images/tabs.gif" alt="Вкладки Острова" width="560">
 
 </div>
 
-> **Status: personal project, rough edges included.** Built by one person (with a lot of help from an AI coding assistant, Claude Code, which wrote most of the code under the author's direction and review) and tested on a single machine: Windows 11, one monitor, Apple Music, VS Code, an iPhone. Things may break elsewhere. Bug reports and ideas are very welcome.
->
-> The screenshots above are a design preview rendered from the HTML playground in `docs/` with fake data, not captures of real data.
+> **Статус: личный проект, с шероховатостями.** Его делает один человек, а большую часть кода по его заданиям и под его проверкой написал ИИ-ассистент Claude Code. Проверялся на одном компьютере: Windows 11, один монитор, Apple Music, VS Code, iPhone. На других системах что-то может не работать. Сообщения об ошибках и идеи очень приветствуются.
 
-## What it does
+## Как это выглядит
 
-The island lives at the top edge of the screen. Collapsed, it is a tiny pill that can show passive activities (timer, render progress, music, downloads, Claude working…). Click it to expand into a header with tabs.
+<table>
+<tr>
+<td><img src="docs/images/hub.png" alt="Главная"></td>
+<td><img src="docs/images/player.png" alt="Плеер"></td>
+</tr>
+<tr>
+<td><img src="docs/images/weather.png" alt="Погода"></td>
+<td><img src="docs/images/time.png" alt="Время"></td>
+</tr>
+<tr>
+<td><img src="docs/images/phone.png" alt="Телефон"></td>
+<td><img src="docs/images/quick.png" alt="Быстрый вопрос (Alt+Q): итоги дня"></td>
+</tr>
+</table>
 
-| Tab | What you get |
+## Что умеет
+
+Остров живёт у верхнего края экрана. Свёрнутый, он совсем маленький и показывает только самое важное (таймер, музыку, загрузку, «Claude работает»). Нажмите на него, и он раскроется со вкладками.
+
+| Вкладка | Что внутри |
 | --- | --- |
-| **Home** | Bluetooth, VPN status, timer, sleep, power; phone battery and last notification; CPU / GPU / RAM rings; mini player; weather tile |
-| **Player** | Cover, controls and synced lyrics (word-by-word when available) for **Apple Music** via Windows media controls; coloured background from the cover; music wave from the real audio spectrum |
-| **Weather** | Open-Meteo forecast, hour-by-hour chart, a one-line summary ("rain until 8 pm"), quiet rain and snow in the background |
-| **Time** | iPhone-style timer wheels, stopwatch with laps; the running timer shows in the collapsed island |
-| **Projects** | One-click open of a folder in VS Code, pinning, search, "open now" dot |
-| **Buffer** | Clipboard history (text and images) and a drag-and-drop file shelf |
-| **Phone** | Battery and notifications of a paired **iPhone** (through Windows *Phone Link*), a QR-code bridge to send files and text between phone and PC over your home network |
-| **Settings** | Glass level, blur, night mode, hotkeys, dictation, apps that shrink the island, optional SSH tunnel |
+| **Главная** | Всё нужное на одном экране: Bluetooth, VPN, таймер, сон и выключение; заряд телефона и последнее уведомление; загрузка процессора, видеокарты и памяти; музыка и погода |
+| **Плеер** | Обложка, кнопки, громкость и текст песни, который идёт в такт (по словам, если такой есть). Для **Apple Music**. Фон окрашивается в цвета обложки |
+| **Погода** | Прогноз на несколько дней и по часам, короткая фраза вроде «дождь закончится около 20:00», на фоне тихо идут дождь или снег |
+| **Время** | Таймер с колёсами как в iPhone и секундомер с кругами. Идущий таймер виден и на свёрнутом острове |
+| **Проекты** | Открывают папку в VS Code одним щелчком. Можно закреплять и искать |
+| **Буфер** | История того, что вы копировали (текст и картинки), и «полка»: бросьте на остров файл, чтобы он был под рукой |
+| **Телефон** | Заряд и уведомления **iPhone**. Ещё QR-код: отсканируйте его, и файлы и текст можно передавать между телефоном и компьютером по домашней сети |
+| **Настройки** | Прозрачность и размытие, ночной режим, горячие клавиши, диктовка, список программ, рядом с которыми остров сжимается, SSH-тоннель (по желанию) |
 
-Plus things that work without opening a tab:
+А это работает, даже когда ни одна вкладка не открыта:
 
-- **Claude Code integration** — permission requests and questions appear as cards on the island ("Allow / Deny"); "Claude is working / finished" with the current step and a list of sessions. Uses Claude Code *hooks*.
-- **Quick answers (Alt+Q)** — a calculator (`15% of 200`, `sqrt(2)*3`), commands (`timer 25`, `volume 30`, `open project`), currency conversion, day summaries, and AI answers streamed straight onto the island (OpenAI API, your own key).
-- **Push-to-talk dictation** — hold the right Alt key, speak (Russian and English), release: the text is typed into the active window.
-- **After Effects render notifications** — a small script inside AE reports render progress and completion.
-- **Notch mode** — in browsers and fullscreen video the island shrinks into a thin notch with a progress bar; in fullscreen games it hides.
-- **Short hints** — Caps Lock, input language, volume and microphone flashes; browser download progress; low disk space warning; reminders and "do X after render" set in plain language.
+- **Claude Code.** Когда Claude просит разрешение или задаёт вопрос, на острове появляется карточка с кнопками «Разрешить» и «Запретить». Пока он работает, видно, что именно он делает, а когда закончит, остров скажет об этом.
+- **Быстрый вопрос (Alt+Q).** Строка, в которую можно написать что угодно: пример (`15% от 200`), команду (`таймер 25`, `громкость 30`, `открой проект`), «100 долларов в рубли», «итоги дня» или обычный вопрос. На вопросы отвечает ИИ (OpenAI, нужен свой ключ), ответ появляется прямо на острове.
+- **Диктовка.** Зажмите правый Alt и говорите (по-русски или по-английски), отпустите, и текст напечатается там, где стоит курсор.
+- **Рендер After Effects.** Остров показывает, что рендер идёт и когда он закончился (для этого в After Effects стоит маленький скрипт).
+- **Режим «нотч».** Когда открыт браузер или видео на весь экран, остров сжимается в тонкую плашку, чтобы не мешать. В играх он прячется совсем.
+- **Короткие подсказки.** Caps Lock, язык ввода, громкость и микрофон; ход загрузок в браузере; мало места на диске; напоминания («напомни через час отдохнуть»).
 
-## Requirements
+## Что нужно
 
-- Windows 11 (Windows 10 may partly work; untested)
-- To run a release build: the **.NET 10 Desktop Runtime**
-- To build: **.NET 10 SDK**
+- Windows 11 (на Windows 10 может частично работать, не проверялось)
+- Чтобы запустить готовую сборку: **.NET 10 Desktop Runtime**
+- Чтобы собрать самому: **.NET 10 SDK**
 
-## Build and run
+## Сборка и запуск
 
 ```powershell
 git clone https://github.com/ment4l-immo/ostrov.git
@@ -52,72 +67,72 @@ cd ostrov
 dotnet run --project src/Ostrov
 ```
 
-or publish a local copy and start it (closes a running instance first):
+Или собрать готовый exe и запустить (если остров уже запущен, он сначала закроется):
 
 ```powershell
-.\Ostrov-update.bat      # publishes to dist\ and launches dist\Ostrov.exe
+.\Ostrov-update.bat      # собирает в dist\ и запускает dist\Ostrov.exe
 ```
 
-Run the logic tests with `dotnet test tests/Ostrov.Tests`.
+Тесты логики: `dotnet test tests/Ostrov.Tests`.
 
-Release builds are **not code-signed**, so Windows SmartScreen will warn on first launch. The phone bridge asks Windows for firewall access the first time you open it.
+Сборки **не подписаны**, поэтому при первом запуске Windows SmartScreen покажет предупреждение. А когда вы впервые откроете мост с телефоном, Windows спросит разрешение на доступ через брандмауэр.
 
-## Optional setup
+## Настройка по желанию
 
-**OpenAI features** (Alt+Q answers, dictation, news summaries): paste your own API key in *Settings → AI & search*. It is stored encrypted with Windows DPAPI under `%AppData%\Ostrov` and never leaves your machine except in requests to OpenAI. You can also set the `OPENAI_API_KEY` environment variable.
+**Функции с OpenAI** (ответы по Alt+Q, диктовка, краткие пересказы): вставьте свой ключ в *Настройки → ИИ и поиск*. Он хранится в зашифрованном виде (средствами Windows, DPAPI) в `%AppData%\Ostrov` и уходит только в запросах к OpenAI. Можно вместо этого задать переменную окружения `OPENAI_API_KEY`.
 
-**Claude Code hooks** (permission cards, "working / finished" status): add the hook to your Claude Code `settings.json` (global or per project), with the real path to this repository:
+**Claude Code** (карточки разрешений и статус «работает / закончил»): добавьте хук в `settings.json` Claude Code (общий или проекта), указав настоящий путь к папке с проектом:
 
 ```json
 {
   "hooks": {
     "PermissionRequest": [{ "hooks": [{ "type": "command", "timeout": 3600,
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\путь\\к\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
     "UserPromptSubmit": [{ "hooks": [{ "type": "command", "timeout": 10,
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\путь\\к\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
     "Stop": [{ "hooks": [{ "type": "command", "timeout": 10,
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\путь\\к\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
     "PreToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "timeout": 10,
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\путь\\к\\ostrov\\tools\\ostrov-hook.ps1\"" }] }],
     "PostToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "timeout": 10,
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\ostrov\\tools\\ostrov-hook.ps1\"" }] }]
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\путь\\к\\ostrov\\tools\\ostrov-hook.ps1\"" }] }]
   }
 }
 ```
 
-The hook talks to the island over a local named pipe only (no network). If the island is not running the hook exits instantly and Claude Code behaves as usual. The island reads only tool names, short file names, project names and session ids — never prompts, answers or command contents.
+Хук говорит с островом только через локальный канал на вашем компьютере, без сети. Если остров не запущен, хук тут же выходит, и Claude Code работает как обычно. Остров видит только названия инструментов, короткие имена файлов, названия проектов и номера сессий. Ваши запросы, ответы Claude и содержимое команд он не читает.
 
-**After Effects**: copy `tools/ae/ostrov-render-notify.jsx` into `Support Files\Scripts\Startup` of your After Effects folder (needs admin rights once) and enable *Allow Scripts to Write Files and Access Network*.
+**After Effects:** скопируйте `tools/ae/ostrov-render-notify.jsx` в папку `Support Files\Scripts\Startup` внутри папки After Effects (один раз понадобятся права администратора) и включите «Allow Scripts to Write Files and Access Network».
 
-**Phone tab**: pair your iPhone with Windows *Phone Link* (Bluetooth). Notifications from apps you turn off in Windows are invisible to Ostrov.
+**Вкладка «Телефон»:** свяжите iPhone с приложением Windows «Связь с телефоном» (по Bluetooth). Уведомления тех приложений, которые вы отключили в Windows, Остров не увидит.
 
-## Privacy and network
+## Приватность и сеть
 
-Nothing is collected and there is no telemetry. The app talks to the network only for the features you use:
+Остров ничего не собирает и не отправляет статистику. В интернет он выходит только ради тех функций, которыми вы пользуетесь:
 
-| Feature | Service | What is sent |
+| Функция | Куда обращается | Что отправляется |
 | --- | --- | --- |
-| Weather | Open-Meteo | City coordinates |
-| Lyrics | LRCLIB | Track title, artist, album, duration |
-| Track info, phone app icons | Apple iTunes Search API | Title / artist / album, or app name |
-| Currency | open.er-api.com | Currency code |
-| AI answers, dictation, summaries | OpenAI API | Your question or audio, with your own key, only when you use it |
-| Optional tunnel | Your own server over SSH | Only OpenAI requests |
+| Погода | Open-Meteo | Координаты города |
+| Тексты песен | LRCLIB | Название, исполнитель, альбом и длительность трека |
+| Сведения о треке, значки приложений телефона | Apple iTunes Search API | Название, исполнитель и альбом или название приложения |
+| Курсы валют | open.er-api.com | Код валюты |
+| Ответы ИИ, диктовка, пересказы | OpenAI API | Ваш вопрос или голос, с вашим ключом и только когда вы этим пользуетесь |
+| Тоннель (по желанию) | Ваш собственный сервер по SSH | Только запросы к OpenAI |
 
-Local data (clipboard history, settings, day journal, reminders…) lives in `%AppData%\Ostrov`. The day journal stores only program names and durations, never window titles, and can be switched off and cleared in Settings.
+Всё остальное (история буфера, настройки, журнал дня, напоминания) лежит на вашем компьютере в `%AppData%\Ostrov`. В журнале дня только названия программ и время, без заголовков окон; его можно выключить и очистить в настройках.
 
-## Known limitations
+## Что пока не так
 
-- Apple Music sound for the wave is taken from its helper process; a different music app will show cover and controls but not the wave.
-- The glass uses the Windows acrylic backdrop in a separate window under the island, so the blur strength is set by Windows; Liquid-Glass-style refraction at the edges is not possible this way.
-- Phone notifications and battery need the phone connected over Bluetooth through Phone Link.
-- No tests for the UI; only the pure logic (calculator, parsers, QR encoder, ranking) is covered.
-- Code comments are mostly in Russian.
+- Звук для «волны» берётся из вспомогательного процесса Apple Music. Другой плеер покажет обложку и кнопки, но без волны.
+- Стекло сделано из размытия Windows в отдельных окнах под островом, поэтому силу размытия задаёт сама Windows. Искажение краёв, как у Liquid Glass, таким способом сделать нельзя.
+- Уведомления и заряд телефона работают, только пока телефон подключён по Bluetooth через «Связь с телефоном».
+- Тестов интерфейса нет, проверена только логика (калькулятор, разборщики, QR-код, ранжирование).
+- Комментарии в коде в основном на русском.
 
-## Trademarks
+## Товарные знаки
 
-Ostrov is an independent hobby project. It is **not affiliated with or endorsed by** Anthropic, Apple, OpenAI, Microsoft, Adobe or any other company mentioned. Claude, Apple Music, iPhone, OpenAI, After Effects, VS Code and other names are trademarks of their owners and are used only to describe what the app integrates with. The project contains no third-party logos or assets; every icon is drawn in code or comes from fonts that ship with Windows.
+Остров — независимый любительский проект. Он **не связан с компаниями** Anthropic, Apple, OpenAI, Microsoft, Adobe и другими упомянутыми и не одобрен ими. Claude, Apple Music, iPhone, OpenAI, After Effects, VS Code и другие названия — товарные знаки их владельцев, они здесь нужны только затем, чтобы сказать, с чем умеет работать приложение. Чужих логотипов и материалов в проекте нет: все значки нарисованы в коде или взяты из шрифтов, которые входят в Windows.
 
-## License
+## Лицензия
 
 [MIT](LICENSE)
