@@ -1,0 +1,18 @@
+# .NET / WPF
+bin/
+obj/
+out/
+dist/
+publish/
+*.user
+*.suo
+.vs/
+*.log
+
+# Секреты и локальные данные никогда не попадают в репозиторий
+*.key
+*.pem
+tunnel_key*
+settings.json
+.env
+.claude/settings.local.json

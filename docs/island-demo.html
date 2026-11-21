@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Остров: стенд стекла</title>
+<style>
+:root{
+  --ink:#E9ECEF; --gray:#8b9096; --graphite:#212529; --graphite-hi:#2B3035;
+  --fill:.80; --edge:.90; --blur:24px; --sat:1; --card:.925; --radius:28px;
+  --rimTop:.35; --rimMid:.17; --rimBot:.30; --sheen:.20; --sheenH:84px; --fadeB:1;
+  --tint:#191970; --tintMix:0; --glowA:.125; --glowSize:70%;
+  --h:332px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#0d0e10;color:#e6e6e6;font:14px/1.4 "Segoe UI",system-ui,sans-serif}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:0;min-height:100vh}
+@media(max-width:1000px){.app{grid-template-columns:1fr}}
+.stagewrap{padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.stage{position:relative;height:560px;border-radius:14px;overflow:hidden;background:#111;isolation:isolate}
+.wall{position:absolute;inset:0;z-index:0;transition:opacity .3s}
+.hint{font-size:12px;color:#8b9096;max-width:760px}
+.wallbtns{display:flex;gap:6px;flex-wrap:wrap}
+button,select{font:inherit}
+.chip{background:#1b1e22;border:1px solid #2b3035;color:#cfd3d8;border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip.on{background:#e9ecef;color:#111;border-color:#e9ecef}
+/* ---------- Остров ---------- */
+.island{position:absolute;top:0;left:50%;width:560px;height:var(--h);transform:translateX(-50%);
+  border-radius:0 0 var(--radius) var(--radius);overflow:hidden;z-index:2;
+  transition:height .42s cubic-bezier(.2,.8,.2,1);
+  backdrop-filter:blur(var(--blur)) saturate(var(--sat));-webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));
+  color:var(--ink)}
+.layer{position:absolute;inset:0;pointer-events:none}
+.fill{background:var(--fillGrad)}
+.tintfill{background:var(--tint);opacity:var(--tintMix)}
+.glow{opacity:1;transition:opacity .4s}
+.sheen{height:var(--sheenH);bottom:auto;background:linear-gradient(to bottom,rgba(255,255,255,var(--sheen)),rgba(255,255,255,calc(var(--sheen)*.42)) 45%,rgba(255,255,255,0))}
+.fade{top:auto;height:28px;background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,calc(var(--fadeB)*.1)) 35%,rgba(0,0,0,calc(var(--fadeB)*.4)) 60%,rgba(0,0,0,calc(var(--fadeB)*.75)) 80%,rgba(0,0,0,var(--fadeB)))}
+.rim{padding:0 1px 1px 1px;border-radius:inherit;
+  background:linear-gradient(to bottom,rgba(255,255,255,var(--rimTop)),rgba(255,255,255,var(--rimMid)) 55%,rgba(255,255,255,var(--rimBot)));
+  -webkit-mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude}
+.inner{position:absolute;inset:0;display:flex;flex-direction:column}
+/* шапка */
+.head{height:50px;flex:none;display:flex;align-items:center;padding:8px 20px 6px 22px;gap:4px}
+.tab{height:36px;border:0;background:transparent;color:var(--ink);display:flex;align-items:center;border-radius:12px;padding:0 10px;cursor:pointer;opacity:.78;overflow:hidden}
+.tab:hover{opacity:1}
+.tab svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab span{max-width:0;opacity:0;white-space:nowrap;font-size:14px;font-weight:500;transition:max-width .38s cubic-bezier(.2,.8,.2,1),opacity .16s,margin .3s}
+.tab.on{background:rgba(33,37,41,var(--card));opacity:1;padding:0 12px 0 10px}
+.tab.on span{max-width:90px;opacity:1;margin-left:7px}
+.sp{flex:1}
+.clock{font-size:13px;color:var(--gray);margin-right:6px;font-variant-numeric:tabular-nums}
+.body{flex:1;margin:0 24px 14px;position:relative;min-height:0}
+.page{position:absolute;inset:0;display:none}
+.page.show{display:block}
+.page>*{animation:rise .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:rgba(33,37,41,var(--card));border-radius:14px;padding:10px 12px}
+.row{display:flex;gap:10px}
+.g{color:var(--gray)} .s{font-size:11.5px} .b{font-weight:600}
+.round{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;font-size:11.5px;color:var(--gray)}
+.round i{width:46px;height:46px;border-radius:50%;background:rgba(33,37,41,var(--card));display:grid;place-items:center;font-style:normal;color:var(--ink);font-size:17px}
+.round i.or{background:#FF9F0A;color:#111}
+.ring{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:10px;
+  background:conic-gradient(var(--ink) calc(var(--p)*1%),#2B3035 0)}
+.ring b{width:30px;height:30px;border-radius:50%;background:#1a1d20;display:grid;place-items:center;font-weight:500}
+.cover{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#c9553d,#6b2d5c 60%,#2b1f44);flex:none}
+.bar{height:5px;border-radius:3px;background:#2B3035;overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.list .card{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ink);flex:none}
+.logo{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;flex:none}
+.tog{width:38px;height:22px;border-radius:11px;background:#2B3035;position:relative;flex:none}.tog.on{background:var(--ink)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#8b9096}.tog.on::after{left:18px;background:#111}
+.pick{display:flex;gap:6px}.pick i{width:54px;height:34px;border-radius:9px;background:#212529;border:1.5px solid transparent;display:grid;place-items:center;font-size:11px;font-style:normal;color:var(--gray)}.pick i.sel{border-color:var(--ink);color:var(--ink)}
+.wheels{display:flex;gap:6px;justify-content:center;align-items:center}
+.wheel{width:62px;height:84px;border-radius:14px;background:rgba(33,37,41,var(--card));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;gap:2px}
+.wheel small{color:#555a60;font-size:15px}.wheel em{font-style:normal;font-size:30px;font-weight:300}
+.btn{border-radius:50%;width:58px;height:58px;display:grid;place-items:center;font-size:13px;background:rgba(255,159,10,.25);color:#FF9F0A}
+.pill{background:rgba(33,37,41,var(--card));border-radius:999px;padding:4px 12px;font-size:12px;color:var(--gray)}
+/* ---------- Панель ---------- */
+.panel{background:#14161a;border-left:1px solid #23262b;padding:16px 16px 28px;overflow:auto;max-height:100vh;position:sticky;top:0;align-self:start}
+@media(max-width:1000px){.panel{position:static;max-height:none;border-left:0;border-top:1px solid #23262b}}
+.panel h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#8b9096;margin:18px 0 8px}
+.panel h2:first-child{margin-top:0}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-bottom:9px}
+.ctl label{font-size:13px;color:#cfd3d8}.ctl output{font-size:12px;color:#8b9096;font-variant-numeric:tabular-nums}
+.ctl input{grid-column:1/3;width:100%;accent-color:#e9ecef;margin:0}
+.ctl small{grid-column:1/3;color:#6a6f76;font-size:11px;margin-top:-2px}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.out{width:100%;height:150px;background:#0d0e10;color:#b9bec5;border:1px solid #2b3035;border-radius:8px;font:12px/1.5 Consolas,monospace;padding:8px;resize:vertical}
+.note{font-size:11.5px;color:#8b9096;margin:6px 0 0}
+.tint{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px}.tint input{width:34px;height:26px;border:0;background:none;padding:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="stagewrap">
+    <div class="wallbtns" id="walls"></div>
+    <div class="stage" id="stage">
+      <div class="wall" id="wall"></div>
+      <div class="island" id="island">
+        <div class="layer fill"></div>
+        <div class="layer tintfill"></div>
+        <div class="layer glow" id="glow"></div>
+        <div class="layer sheen"></div>
+        <div class="layer fade"></div>
+        <div class="inner">
+          <div class="head" id="head"></div>
+          <div class="body" id="body"></div>
+        </div>
+        <div class="layer rim"></div>
+      </div>
+    </div>
+    <div class="hint">Демо рисует остров в браузере: ничего в самом приложении не меняет. Нажимай вкладки, крути ползунки справа, потом «Скопировать выбор» и пришли мне текст — я перенесу числа в WPF. <b>Важно:</b> в приложении силу размытия задаёт Windows (ползунок «Размытие» здесь только для сравнения, в приложении она остаётся как есть), заливка, кромка, блик, оттенки и карточки переносятся один в один.</div>
+  </div>
+
+  <aside class="panel">
+    <h2>Готовые наборы</h2>
+    <div class="presets" id="presets"></div>
+
+    <h2>Стекло острова</h2>
+    <div id="c-glass"></div>
+    <h2>Кромка и блик</h2>
+    <div id="c-rim"></div>
+    <h2>Вкладки и карточки</h2>
+    <div id="c-tab"></div>
+    <div class="tint"><span>Свой цвет текущей вкладки</span><input type="color" id="tintPick"><button class="chip" id="tintReset">сброс</button></div>
+    <h2>Выбор</h2>
+    <textarea class="out" id="out" readonly></textarea>
+    <div style="display:flex;gap:6px;margin-top:8px"><button class="chip on" id="copy">Скопировать выбор</button><button class="chip" id="reset">Сбросить всё</button></div>
+    <p class="note" id="copied"></p>
+  </aside>
+</div>
+
+<script>
+/* ===== данные ===== */
+const TABS=[
+ {id:'hub',name:'Главная',h:332,color:'#12215e',icon:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'},
+ {id:'player',name:'Плеер',h:214,color:'#7a3b5a',icon:'<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>'},
+ {id:'weather',name:'Погода',h:330,color:'#3b6a9a',icon:'<path d="M7 18a4 4 0 010-8 5.5 5.5 0 0110.6 1.2A3.4 3.4 0 0117 18z"/>'},
+ {id:'time',name:'Время',h:238,color:'#c9780a',icon:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6"/>'},
+ {id:'projects',name:'Проекты',h:270,color:'#4a5a70',icon:'<path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>'},
+ {id:'buffer',name:'Буфер',h:260,color:'#6a5646',icon:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/>'},
+ {id:'phone',name:'Телефон',h:300,color:'#3f6a5a',icon:'<rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/>'},
+ {id:'settings',name:'Настройки',h:290,color:'#5a5f66',icon:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'},
+];
+const DEF={fill:78,edge:81,blur:10,sat:80,rimTop:10,rimMid:10,rimBot:10,sheen:5,sheenH:108,fadeB:10,tintMix:8,glow:12,glowSize:70,card:55,radius:38}; // значения, выбранные в стенде и перенесённые в приложение
+const SLIDERS={
+ glass:[
+  ['fill','Заливка в центре (непрозрачность)',50,98,1,'%','В приложении: Слабо 88 / Средне 80 / Сильно 72'],
+  ['edge','Плотность у боковых краёв',70,100,1,'%','У самого края: 90 % сейчас'],
+  ['blur','Размытие (только для сравнения)',0,50,1,'px','В приложении силу задаёт Windows'],
+  ['sat','Насыщенность размытого фона',60,200,5,'%',''],
+  ['radius','Скругление низа',12,40,1,'px',''],
+  ['fadeB','Затемнение у нижнего края',0,100,5,'%','Прячет полосу без размытия'],
+ ],
+ rim:[
+  ['rimTop','Кромка, сверху',0,80,1,'%',''],['rimMid','Кромка, посередине',0,80,1,'%',''],['rimBot','Кромка, снизу',0,80,1,'%',''],
+  ['sheen','Блик сверху, сила',0,60,1,'%',''],['sheenH','Блик сверху, высота',0,160,2,'px',''],
+ ],
+ tab:[
+  ['tintMix','Оттенок заливки по вкладке',0,60,1,'%','Заливка острова чуть окрашивается цветом вкладки'],
+  ['glow','Цветные пятна по углам',0,60,0.5,'%','Сейчас у вкладок 12,5 %'],
+  ['glowSize','Размер пятен',30,120,5,'%','Сейчас 70 %'],
+  ['card','Карточки: непрозрачность графита',55,100,0.5,'%','Сейчас 92,5 % (прозрачность 7,5)'],
+ ]};
+const PRESETS={
+ 'Сейчас (с кромкой)':{...DEF},
+ 'Как было до кромки':{...DEF,rimTop:0,rimMid:0,rimBot:0,sheen:0},
+ 'Liquid Glass':{...DEF,fill:56,edge:88,blur:28,sat:150,rimTop:46,rimMid:14,rimBot:38,sheen:28,sheenH:96,tintMix:14,glow:22,glowSize:90,card:84},
+ 'Матовое тёмное':{...DEF,fill:92,edge:96,blur:14,sat:100,rimTop:22,rimMid:10,rimBot:20,sheen:10,sheenH:60,tintMix:6,glow:10,card:96},
+ 'Яркие вкладки':{...DEF,fill:72,edge:90,rimTop:40,rimMid:16,rimBot:32,sheen:22,tintMix:30,glow:34,glowSize:100,card:88},
+};
+let S={...DEF};const custom={};
+
+/* ===== обои ===== */
+const WALLS={
+ 'Яркие синие':`radial-gradient(circle at 25% 30%,#FB5607 0 70px,transparent 71px),radial-gradient(circle at 72% 62%,#ffd166 0 90px,transparent 91px),repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 2px,transparent 2px 60px),linear-gradient(135deg,#191970,#4a4ab4 60%,#e9ecef)`,
+ 'Светлый документ':`repeating-linear-gradient(180deg,#d9dde2 0 2px,transparent 2px 22px),linear-gradient(#f4f5f7,#fff);background-size:auto`,
+ 'Тёмный рабочий стол':`radial-gradient(circle at 60% 40%,#2a3b7a 0 120px,transparent 121px),radial-gradient(circle at 20% 70%,#7a2a4a 0 90px,transparent 91px),linear-gradient(160deg,#0d0f14,#1a1d26)`,
+ 'Игра / видео':`radial-gradient(circle at 35% 25%,#ffbf69 0 60px,transparent 61px),linear-gradient(180deg,#2d6a4f 0 55%,#1b4332 55%),linear-gradient(90deg,#74c69d,#40916c)`,
+ 'Фото-пятна':`conic-gradient(from 20deg at 50% 50%,#ff6b6b,#feca57,#48dbfb,#5f27cd,#ff6b6b)`,
+};
+let wallName='Яркие синие';
+
+/* ===== построение ===== */
+const $=s=>document.querySelector(s);
+const head=$('#head'),body=$('#body');
+function mkTabs(){
+  head.innerHTML=TABS.slice(0,7).map(t=>`<button class="tab" data-id="${t.id}" aria-label="${t.name}"><svg viewBox="0 0 24 24">${t.icon}</svg><span>${t.name}</span></button>`).join('')+
+   `<div class="sp"></div><div class="clock" id="clock"></div>`+
+   (t=>`<button class="tab" data-id="${t.id}" aria-label="${t.name}"><svg viewBox="0 0 24 24">${t.icon}</svg><span>${t.name}</span></button>`)(TABS[7]);
+  head.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.id));
+  const tick=()=>{const d=new Date();$('#clock').textContent=d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})};tick();setInterval(tick,20000);
+}
+const PAGES={
+hub:`<div class="row" style="--i:0;margin-top:2px">${[['ᛒ','Bluetooth'],['⛨','Amnezia'],['⏲','Таймер 25 мин','or'],['☾','Сон'],['⏻','Выключить']].map(x=>`<div class="round"><i class="${x[2]||''}">${x[0]}</i>${x[1]}</div>`).join('')}</div>
+ <div class="row" style="margin-top:12px;--i:1"><div class="card" style="flex:1"><div class="s g">Телефон</div><div class="b" style="font-size:18px;margin:2px 0">78 % <span class="s g">на связи</span></div><div class="s g">Telegram · Мама · 2 мин</div></div>
+ <div class="card" style="flex:1"><div class="s g" style="margin-bottom:6px">Нагрузка</div><div class="row" style="justify-content:space-around"><div class="ring" style="--p:34"><b>34</b></div><div class="ring" style="--p:12"><b>12</b></div><div class="ring" style="--p:61"><b>61</b></div></div></div></div>
+ <div class="row" style="margin-top:12px;--i:2"><div class="card row" style="flex:1.25;align-items:center"><div class="cover" style="width:44px;height:44px"></div><div style="flex:1;min-width:0"><div class="b">Ночные огни</div><div class="s g">Автостопом по фазе сна</div></div><div style="letter-spacing:6px">⏮⏯⏭</div></div>
+ <div class="card row" style="flex:1;align-items:center"><div style="font-size:26px">⛅</div><div><div class="b" style="font-size:17px">+11°</div><div class="s g">Москва · Дождь к вечеру</div></div></div></div>`,
+player:`<div class="row" style="gap:14px;align-items:center;margin-top:6px;--i:0"><div class="cover" style="width:104px;height:104px;border-radius:14px"></div><div style="flex:1"><div class="b" style="font-size:18px">Ночные огни</div><div class="g">Автостопом по фазе сна</div><div class="bar" style="margin:14px 0 6px"><i style="width:38%"></i></div><div class="row s g" style="justify-content:space-between"><span>1:24</span><span>3:41</span></div><div style="font-size:22px;letter-spacing:14px;margin-top:6px">⏮⏯⏭</div></div></div>`,
+weather:`<div class="row" style="justify-content:space-between;align-items:flex-start;margin-top:2px;--i:0"><div><div style="font-size:46px;font-weight:300;line-height:1">+11°</div><div>Дождь</div><div class="s g">Дождь закончится около 20:00</div><div class="s g" style="margin-top:6px">Ощущается +8° · ветер 4 м/с</div></div><div style="font-size:54px">🌧</div></div>
+ <div class="row" style="margin-top:14px;--i:1">${['Сегодня','Сб','Вс','Пн','Вт'].map((d,i)=>`<div class="card" style="flex:1;text-align:center"><div class="s g">${d}</div><div style="font-size:22px;margin:4px 0">${['🌧','⛅','☀','☀','☁'][i]}</div><div class="b">+${12-i}°</div><div class="s g">+${5-i}°</div></div>`).join('')}</div>
+ <div class="card" style="margin-top:12px;--i:2"><div class="s g">Подробности дня</div><div style="height:46px;margin-top:6px;border-radius:8px;background:linear-gradient(90deg,transparent,rgba(233,236,239,.18));clip-path:polygon(0 80%,25% 50%,50% 30%,75% 55%,100% 40%,100% 100%,0 100%)"></div></div>`,
+time:`<div class="row" style="justify-content:center;margin:4px 0 12px;--i:0"><span class="pill" style="background:var(--ink);color:#111">Таймер</span><span class="pill" style="margin-left:6px">Секундомер</span></div>
+ <div class="row" style="align-items:center;justify-content:center;gap:18px;--i:1"><div class="row" style="flex-direction:column"><span class="pill">5 мин</span><span class="pill">10 мин</span><span class="pill">25 мин</span></div><div class="wheels"><div class="wheel"><small>0</small><em>0</em><small>1</small></div><div class="wheel"><small>24</small><em>25</em><small>26</small></div><div class="wheel"><small>59</small><em>00</em><small>01</small></div></div><div class="btn">Старт</div></div>`,
+projects:`<div class="row" style="gap:8px;align-items:center;margin-bottom:10px;--i:0"><span class="pill" style="background:var(--ink);color:#111">Избранные</span><span class="pill">Недавние</span><div class="sp"></div><span class="pill" style="min-width:130px">⌕ Поиск</span></div>
+ <div class="list" style="--i:1">${[['ostrov','Desktop · сегодня',1],['site-portfolio','Projects · вчера',0],['ae-templates','Documents · 3 дня назад',0],['notes','Desktop · 2 нед. назад',0]].map(p=>`<div class="card"><span class="dot" style="opacity:${p[2]?1:0}"></span><div><div>${p[0]}</div><div class="s g">${p[1]}</div></div></div>`).join('')}</div>`,
+buffer:`<div class="row" style="gap:8px;margin-bottom:10px;--i:0"><span class="pill" style="background:var(--ink);color:#111">История</span><span class="pill">Полка</span><div class="sp"></div><span class="pill">Очистить</span></div>
+ <div class="list" style="--i:1">${['https://example.com/article/47','Список дел на завтра: рендер, письма','#FB5607','C:\\Users\\you\\Projects\\ostrov'].map(t=>`<div class="card"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</div></div>`).join('')}</div>`,
+phone:`<div class="row" style="justify-content:space-between;align-items:flex-start;margin-top:0;--i:0"><div><div class="s g">пятница, 20 ноября</div><div style="font-size:40px;font-weight:300;line-height:1.05">18:42</div></div><div style="text-align:right"><div class="s g">● iPhone</div><div class="b">78 % ▮</div></div></div>
+ <div class="list" style="margin-top:10px;--i:1">${[['Telegram','Мама','#2AABEE','T'],['Instagram','anna.k','#E1306C','I'],['Mail','Рендер готов','#3b82f6','M']].map(x=>`<div class="card" style="border-radius:16px;padding:9px 12px"><div class="logo" style="background:${x[2]}">${x[3]}</div><div style="flex:1"><div class="s g">${x[0]} · сейчас</div><div>${x[1]}</div></div></div>`).join('')}</div>`,
+settings:`<div class="row" style="gap:8px;margin-bottom:10px;--i:0"><span class="pill" style="background:var(--ink);color:#111">Общие</span><span class="pill">ИИ и поиск</span><span class="pill">Диктовка</span><span class="pill">Программы</span></div>
+ <div class="card row" style="align-items:center;margin-bottom:8px;--i:1"><div style="flex:1"><div>Стекло острова</div><div class="s g">Насколько просвечивает</div></div><div class="pick"><i>Слабо</i><i class="sel">Средне</i><i>Сильно</i></div></div>
+ <div class="card row" style="align-items:center;margin-bottom:8px;--i:2"><div style="flex:1"><div>Ночной режим</div><div class="s g">Приглушать после 22:00</div></div><div class="pick"><i class="sel">День</i><i>Ночь</i></div></div>
+ <div class="card row" style="align-items:center;--i:3"><div style="flex:1"><div>Размытие фона</div></div><div class="tog on"></div></div>`,
+};
+function mkPages(){body.innerHTML=TABS.map(t=>`<section class="page" id="p-${t.id}">${PAGES[t.id]}</section>`).join('')}
+let cur='hub';
+function show(id){
+  cur=id;const t=TABS.find(x=>x.id===id);
+  head.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  body.querySelectorAll('.page').forEach(p=>{p.classList.remove('show')});
+  const pg=$('#p-'+id);void pg.offsetWidth;pg.classList.add('show');
+  $('#island').style.setProperty('--h',t.h+'px');
+  $('#tintPick').value=custom[id]||t.color;
+  applyTint();
+}
+/* ===== применение ===== */
+function fillGrad(){
+  const c=S.fill/100,e=Math.max(c,S.edge/100);
+  const curve=[[0,0],[8,.15],[18,.45],[30,.8],[42,1]];
+  const mix=m=>(e+(c-e)*m).toFixed(3);
+  const stops=[...curve.map(([o,m])=>`rgba(0,0,0,${mix(m)}) ${o}%`),...[...curve].reverse().slice(0).map(([o,m])=>`rgba(0,0,0,${mix(m)}) ${100-o}%`)];
+  return `linear-gradient(to right,${stops.join(',')})`;
+}
+function glowBg(col){
+  const a=S.glow/100,sz=S.glowSize;
+  const h=col.replace('#','');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  const lite=(k)=>`rgb(${Math.min(255,r+k)},${Math.min(255,g+k)},${Math.min(255,b+k)})`;
+  const blob=(x,y,c)=>`radial-gradient(circle at ${x}% ${y}%,rgba(${c},${a}) 0,rgba(${c},0) ${sz}%)`;
+  const cs=[`${r},${g},${b}`,lite(30).match(/\d+/g).join(','),`${r},${g},${b}`,lite(55).match(/\d+/g).join(',')];
+  return [blob(0,0,cs[0]),blob(100,0,cs[1]),blob(0,100,cs[2]),blob(100,100,cs[3])].join(',');
+}
+function applyTint(){
+  const col=custom[cur]||TABS.find(t=>t.id===cur).color;
+  const el=$('#island');
+  el.style.setProperty('--tint',col);
+  $('#glow').style.background=glowBg(col);
+}
+function apply(){
+  const el=$('#island').style;
+  el.setProperty('--fillGrad',fillGrad());
+  el.setProperty('--blur',S.blur+'px');el.setProperty('--sat',S.sat/100);
+  el.setProperty('--radius',S.radius+'px');
+  el.setProperty('--rimTop',S.rimTop/100);el.setProperty('--rimMid',S.rimMid/100);el.setProperty('--rimBot',S.rimBot/100);
+  el.setProperty('--sheen',S.sheen/100);el.setProperty('--sheenH',S.sheenH+'px');
+  el.setProperty('--fadeB',Math.min(1,S.fadeB/100*(S.fill<90?(1-0.1/(1-S.fill/100)):0)));
+  el.setProperty('--tintMix',S.tintMix/100);
+  el.setProperty('--card',S.card/100);
+  applyTint();
+  $('#out').value=Object.entries(S).map(([k,v])=>k+' = '+v).concat(Object.entries(custom).map(([k,v])=>'цвет вкладки '+k+' = '+v)).concat('обои = '+wallName).join('\n');
+}
+function mkSliders(){
+  for(const grp of Object.keys(SLIDERS)){
+    $('#c-'+grp).innerHTML=SLIDERS[grp].map(([k,l,min,max,step,u,hint])=>`<div class="ctl"><label for="s-${k}">${l}</label><output id="o-${k}"></output><input type="range" id="s-${k}" min="${min}" max="${max}" step="${step}">${hint?`<small>${hint}</small>`:''}</div>`).join('');
+  }
+  document.querySelectorAll('.ctl input').forEach(inp=>{
+    const k=inp.id.slice(2);const unit=Object.values(SLIDERS).flat().find(x=>x[0]===k)[5];
+    inp.oninput=()=>{S[k]=+inp.value;$('#o-'+k).textContent=S[k]+' '+unit;apply()};
+  });
+}
+function syncSliders(){document.querySelectorAll('.ctl input').forEach(inp=>{const k=inp.id.slice(2);inp.value=S[k];const unit=Object.values(SLIDERS).flat().find(x=>x[0]===k)[5];$('#o-'+k).textContent=S[k]+' '+unit})}
+function mkPresets(){
+  $('#presets').innerHTML=Object.keys(PRESETS).map(n=>`<button class="chip" data-n="${n}">${n}</button>`).join('');
+  document.querySelectorAll('#presets .chip').forEach(b=>b.onclick=()=>{S={...PRESETS[b.dataset.n]};syncSliders();apply()});
+}
+function mkWalls(){
+  $('#walls').innerHTML=Object.keys(WALLS).map(n=>`<button class="chip${n===wallName?' on':''}" data-n="${n}">${n}</button>`).join('');
+  document.querySelectorAll('#walls .chip').forEach(b=>b.onclick=()=>{wallName=b.dataset.n;mkWalls();setWall()});
+}
+function setWall(){
+  const raw=WALLS[wallName];const [bg,rest]=raw.split(';background-size');
+  $('#wall').style.background=bg;apply();
+}
+$('#tintPick').oninput=e=>{custom[cur]=e.target.value;apply()};
+$('#tintReset').onclick=()=>{delete custom[cur];$('#tintPick').value=TABS.find(t=>t.id===cur).color;apply()};
+$('#reset').onclick=()=>{S={...DEF};for(const k in custom)delete custom[k];syncSliders();show(cur);};
+$('#copy').onclick=async()=>{
+  const txt=$('#out').value;
+  try{await navigator.clipboard.writeText(txt)}catch(e){$('#out').select();document.execCommand('copy')}
+  $('#copied').textContent='Скопировано: вставь в чат с Claude.';setTimeout(()=>$('#copied').textContent='',3000);
+};
+mkTabs();mkPages();mkSliders();mkPresets();mkWalls();syncSliders();setWall();show('hub');
+// Ссылка вида island-demo.html#weather?wall=2 открывает нужную вкладку и обои (для скриншотов).
+{const [hid,q]=location.hash.slice(1).split('?');if(TABS.some(t=>t.id===hid))show(hid);const wi=+new URLSearchParams(q||'').get('wall');const names=Object.keys(WALLS);if(wi>0&&names[wi]){wallName=names[wi];mkWalls();setWall();}}
+</script>
+</body>
+</html>

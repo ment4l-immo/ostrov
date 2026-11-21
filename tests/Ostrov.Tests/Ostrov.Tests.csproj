@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Ostrov.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <!-- Чистая логика собирается прямо из src: внутренние классы остаются внутренними, но видимы тестам.
+       Ни один файл src не меняется и не перезаписывается. -->
+  <ItemGroup>
+    <Compile Include="..\..\src\Ostrov\Search\Calculator.cs" Link="Source\Calculator.cs" />
+    <Compile Include="..\..\src\Ostrov\Search\CommandParser.cs" Link="Source\CommandParser.cs" />
+    <Compile Include="..\..\src\Ostrov\Services\IslandCommands.cs" Link="Source\IslandCommands.cs" />
+    <Compile Include="..\..\src\Ostrov\Modules\Player\Lyrics\LyricsModels.cs" Link="Source\LyricsModels.cs" />
+    <Compile Include="..\..\src\Ostrov\Modules\News\NewsModels.cs" Link="Source\NewsModels.cs" />
+    <Compile Include="..\..\src\Ostrov\Modules\News\NewsRanker.cs" Link="Source\NewsRanker.cs" />
+    <Compile Include="..\..\src\Ostrov\Modules\Phone\Bridge\QrCode.cs" Link="Source\QrCode.cs" />
+  </ItemGroup>
+
+</Project>
