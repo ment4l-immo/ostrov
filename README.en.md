@@ -6,8 +6,6 @@ A small black pill at the top of your screen. Click it and it opens up with musi
 
 **[На русском](README.md)** · [Design playground](docs/island-demo.html) · [Architecture](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
 
-<img src="docs/images/tabs.gif" alt="Ostrov tabs" width="560">
-
 </div>
 
 > **Status: personal project, rough edges included.** Built by one person (with a lot of help from an AI coding assistant, Claude Code, which wrote most of the code under the author's direction and review) and tested on a single machine: Windows 11, one monitor, Apple Music, VS Code, an iPhone. Things may break elsewhere. Bug reports and ideas are very welcome.
